@@ -12,9 +12,9 @@
     <div style="display: flex;">
         <div style="flex: 30%">
             <nav>
-                <a href="logout"></a>
-                <a href="rewards"></a>
-                <a href="admin"></a>
+                <a href="logout">Logout</a>
+                <a href="rewards">Rewards</a>
+                <a href="admin">Admin</a>
             </nav>
         </div>
         <div style="flex: 70%">
@@ -32,19 +32,21 @@
             <div id="posts"></div>
 
             <script>
-                // fetch('w5fqdgkvfb.execute-api.ap-southeast-2.amazonaws.com/test/post', {
-                //     body: JSON.stringify({
-                //         sources: ['Test'],
-                //         max: 5
-                //     })
-                // }).then(res => JSON.parse(res))
-                // .then(res => {
-                //     res.forEach(post => {
-                //         let doc = document.createElement('div')
-                //         doc.innerText = res
-                //         document.getElementById('posts').appendChild(doc)
-                //     })
-                // })
+                fetch('/feed', {
+                    method: 'post',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        max: 5
+                    })
+                }).then(res => res.json())
+                .then(res => {
+                    console.log(res)
+                    res.posts.forEach(post => {
+                        let doc = document.createElement('div')
+                        doc.innerHTML = `<h1>${post.username}</h1><p>${post.test}</p>`
+                        document.getElementById('posts').appendChild(doc)
+                    })
+                })
             </script>
         </div>
     </div>

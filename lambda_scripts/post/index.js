@@ -12,7 +12,7 @@ exports.handler = async (event) => {
     if (method == 'GET') {
         if (!body['sources']) { return { statusCode: 400, body: JSON.stringify({ error: 'Must have list of sources' }) }}
         if (!body['after'] && !body['max']) { return { statusCode: 400, body: JSON.stringify({ error: 'Must have max entries or entries after' }) }}
-
+        
         let posts = []
         let earliest = body['after'] || Date.now() - 604800000 // One Week
         let count = body['max'] || 20
