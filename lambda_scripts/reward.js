@@ -11,10 +11,10 @@ exports.handler = (event, context, callback) => {
 
     if (method == 'GET') {
         let data = await doc.send(new ScanCommand({
-            TableName: 'USER',
-            FilterExpression: 'email = :e',
+            TableName: 'REWARD',
+            FilterExpression: 'id = :i',
             ExpressionAttributeValues: {
-                ":e": { S: req.body.email },
+                ":i": { S: body.id },
             },
             ProjectionExpression: 'email',
         }))

@@ -5,14 +5,11 @@ const crypto = require('crypto')
 exports.handler = async (event, context, callback) => {
     let dub = new DynamoDBClient({region: 'ap-southeast-2'})
     let doc = DynamoDBDocumentClient.from(dub)
-
     let body = JSON.parse(event.body)
-
-    let method = event.input.httpMethod
-
+    let method = event.httpMethod
     if (method == 'GET') {
         let data = await doc.send(new ScanCommand({
-            TableName: 'USER',
+            TableName: 'USERS',
             FilterExpression: 'username = :u AND password = :p',
             ExpressionAttributeValues: {
                 ":u": { S: body.username },
@@ -29,20 +26,19 @@ exports.handler = async (event, context, callback) => {
     }
 
     if (method == 'POST') {
-
         if (!body['password']) { return { statusCode: 400, body: JSON.stringify({ error: 'Must include a password' }) } }
         if (!body['username']) { return { statusCode: 400, body: JSON.stringify({ error: 'Must include a username' }) } }
-
+        
         let data = await doc.send(new ScanCommand({
             TableName: 'USERS',
             FilterExpression: 'username = :u',
             ExpressionAttributeValues: {
                 ":u": { S: body.username },
             },
-            ProjectionExpression: 'username',
+            ProjectionExpression: 'id',
         }))
         if (data.Items.length > 0) { return { statusCode: 400, body: JSON.stringify({ error: 'Username already taken' }) } }
-
+        
         doc.send(new PutCommand({
             TableName: 'USERS',
             Item: {

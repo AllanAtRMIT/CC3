@@ -10,7 +10,6 @@ const USERS = {
     AttributeDefinitions: [ 
         { AttributeName: 'username', AttributeType: 'S' },
         { AttributeName: 'id', AttributeType: 'S' },
-        { AttributeName: 'type', AttributeType: 'S' },
     ],
     KeySchema: [
         { AttributeName: 'username', KeyType: 'HASH' },
@@ -28,12 +27,12 @@ const USERS = {
 
 const POSTS = {
     AttributeDefinitions: [ 
-        { AttributeName: 'email', AttributeType: 'S' },
-        { AttributeName: 'username', AttributeType: 'S' },
+        { AttributeName: 'owner', AttributeType: 'S' },
+        { AttributeName: 'time', AttributeType: 'N' },
     ],
     KeySchema: [
-        { AttributeName: 'email', KeyType: 'HASH' },
-        { AttributeName: 'username', KeyType: 'RANGE' },
+        { AttributeName: 'owner', KeyType: 'HASH' },
+        { AttributeName: 'time', KeyType: 'RANGE' },
     ],
     ProvisionedThroughput: {
         ReadCapacityUnits: 1,
@@ -47,12 +46,12 @@ const POSTS = {
 
 const REWARDS = {
     AttributeDefinitions: [ 
-        { AttributeName: 'email', AttributeType: 'S' },
-        { AttributeName: 'title', AttributeType: 'S' },
+        { AttributeName: 'owner', AttributeType: 'S' },
+        { AttributeName: 'time', AttributeType: 'N' },
     ],
     KeySchema: [
-        { AttributeName: 'email', KeyType: 'HASH' },
-        { AttributeName: 'title', KeyType: 'RANGE' },
+        { AttributeName: 'owner', KeyType: 'HASH' },
+        { AttributeName: 'time', KeyType: 'RANGE' },
     ],
     ProvisionedThroughput: {
         ReadCapacityUnits: 1,
