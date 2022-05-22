@@ -1,0 +1,66 @@
+body {
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+}
+
+div > div > div > div {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: solid;
+    border-width: 2px;
+    margin-bottom: 1em;
+}
+
+div > div > div > div > div {
+    border-width: 0;
+}
+
+p {
+    margin-left: 1em;
+}
+
+form  {
+    border-width: 1px;
+    border-style: dashed;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
+    margin-bottom: 1em;
+}
+
+form > input {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+form > label {
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1 { text-align: center; }
+
+img {
+    width: 5em;
+}
+
+a {
+    display: block;
+    margin-left: 1em;
+    font-size: 1.5em;
+    text-decoration: none;
+}
+
+table {
+    vertical-align: middle;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}

@@ -67,9 +67,28 @@ app.get('/', (req, res) => {
     res.send(template({ username: req.session.user }))
 })
 
-app.get('/user/:userid', (req, res) => {
+app.get('/user/:userid', async (req, res) => {
+    let vis = 'hidden'
+    if(req.session['user']) {
+        let dub = new DynamoDBClient({region: 'ap-southeast-2'})
+        let doc = DynamoDBDocumentClient.from(dub)
+    
+        let data = await doc.send(new ScanCommand({
+            TableName: 'USERS',
+            FilterExpression: 'username = :u',
+            ExpressionAttributeValues: {
+                ":u": { S: req.session.user },
+            },
+            ProjectionExpression: 'username, id, password, subscriptions',
+        }))
+        if (data.Items[0]['subscriptions']) {
+            let subs = JSON.parse(data.Items[0]['subscriptions'].S)
+            if (subs.indexOf(req.params.userid) == -1) { vis = 'visible' } 
+        }
+    }
+
     let template = Handlebars.compile(fs.readFileSync('./templates/view_user.html', {encoding: 'utf-8'}))
-    res.send(template({ userview: req.params.userid }))
+    res.send(template({ userview: req.params.userid, vis: vis }))
 })
 
 app.get('/user/', (req, res) => {
@@ -102,7 +121,7 @@ app.post('/feed', async (req, res) => {
         },
         ProjectionExpression: 'username, id, password, subscriptions',
     }))
-
+    if (!data.Items[0]['subscriptions']) { return }
     superagent
         .get(`${API_URL}/post`)
         .send({...req.body, method: 'GET', sources: data.Items[0].subscriptions.S})
@@ -112,6 +131,8 @@ app.post('/feed', async (req, res) => {
 })
 
 app.post('/subscribe', async (req, res) => {
+    if (!req.session['user']) { return }
+
     let dub = new DynamoDBClient({region: 'ap-southeast-2'})
     let doc = DynamoDBDocumentClient.from(dub)
 
@@ -128,8 +149,10 @@ app.post('/subscribe', async (req, res) => {
         console.log(data.Items[0])
         let subs = JSON.stringify([req.session.user])
         if (data.Items[0]['subscriptions']) {
-            if (JSON.parse(data.Items[0]['subscriptions']['S']).indexOf(body.username) == -1) {
-                subs = JSON.stringify(JSON.parse(data.Items[0]['subscriptions']['S']).push(body.username))
+            if (JSON.parse(data.Items[0]['subscriptions']['S']).indexOf(req.body.username) == -1) {
+                subs = JSON.parse(data.Items[0]['subscriptions']['S'])
+                subs.push(req.body.username)
+                subs = JSON.stringify(subs)
             } else {
                 subs = data.Items[0]['subscriptions']['S']
             }
