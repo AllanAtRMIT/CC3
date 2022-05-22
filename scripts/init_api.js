@@ -5,3 +5,7 @@
 
 // user -> PUT
 // user -> GET
+
+// avatar -> GET
+// avatar -> INSERT
+// avatar -> UPDATE
