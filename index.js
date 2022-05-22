@@ -5,6 +5,7 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const Handlebars = require('handlebars');
+const superagent = require('superagent')
 
 const { env } = require('process');
 const req = require('express/lib/request');
@@ -13,7 +14,7 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const crypto = require('crypto')
 
 
-const API_URL = 'w5fqdgkvfb.execute-api.ap-southeast-2.amazonaws.com/user/'
+const API_URL = 'https://w5fqdgkvfb.execute-api.ap-southeast-2.amazonaws.com/test'
 
 // let dub = new DynamoDBClient({region: 'ap-southeast-2'})
 // let doc = DynamoDBDocumentClient.from(dub)
@@ -33,50 +34,35 @@ app.get('/login', (req, res) => {
     res.send(template())
 })
 
+app.post('/login', (req, res) => {
+    superagent
+        .post(`${API_URL}/user`)
+        .send({...req.body, method: 'GET'})
+        .end((err, result) => {
+            if (!result.body['error']) { req.session.user = req.body.username }
+            res.send(result.body)
+        })
+})
+
 app.get('/register', (req, res) => {
     let template = Handlebars.compile(fs.readFileSync('./templates/view_register.html', {encoding: 'utf-8'}))
     res.send(template())
 })
 
 app.post('/register', async (req, res) => {
-    try {
-        let dub = new DynamoDBClient({region: 'ap-southeast-2'})
-        let doc = DynamoDBDocumentClient.from(dub)
-
-        let body = req.body
-
-
-        let data = await doc.send(new ScanCommand({
-            TableName: 'USERS',
-            FilterExpression: 'username = :u',
-            ExpressionAttributeValues: {
-                ":u": { S: body.username },
-            },
-            ProjectionExpression: 'username',
-        }))
-        if (data.Items.length > 0) { res.send({ error: 'Username has already been used' }); return }
-
-
-        let result = await doc.send(new PutCommand({
-            TableName: 'USERS',
-            Item: {
-                username: body.username,
-                id: crypto.randomBytes(64).toString('hex'),
-                password: body.password
-            }
-        }))
-
-        console.log(result)
-
-        if (result) { res.send( { 'redirect': '/' }) }
-    } catch {
-        res.send({ error: 'Failed to Register' })
-    }
+    superagent
+        .post(`${API_URL}/user`)
+        .send(req.body)
+        .end((err, result) => {
+            // if (!result.body['error']) { req.session.user = req.body.username }
+            res.send(result.body)
+        })
 })
 
 app.get('/', (req, res) => {
+    if (!req.session['user']) { res.redirect('/login'); return }
     let template = Handlebars.compile(fs.readFileSync('./templates/view_feed.html', {encoding: 'utf-8'}))
-    res.send(template())
+    res.send(template({ username: req.session.user }))
 })
 
 app.get('/user/:userid', (req, res) => {
@@ -86,6 +72,29 @@ app.get('/user/:userid', (req, res) => {
 
 app.get('/user/', (req, res) => {
     
+})
+
+// Create Post
+app.post('/post', (req, res) => {
+    superagent
+        .post(`${API_URL}/post`)
+        .send({
+            owner: req.body.owner,
+            text: req.body.text,
+        })
+        .end((err, result) => {
+            res.send(result.body)
+        })
+})
+
+// Get Posts
+app.get('/post', (req, res) => {
+    superagent
+        .get(`${API_URL}/post`)
+        .send({...req.body, method: 'GET'})
+        .end((err, result) => {
+            res.send(result.body)
+        })
 })
 
 const PORT = 3000

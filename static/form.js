@@ -1,4 +1,4 @@
-function submitForm(e, url) {
+function submitForm(e, url, _form) {
     e.preventDefault();
 
     // FOR IF WE NEED IMAGES UPLOADED
@@ -9,7 +9,7 @@ function submitForm(e, url) {
     //     reader.onload = () => { do_fetch(reader.result) }
     // } else { do_fetch('') }
     // return false
-    let form = document.getElementsByTagName('form')[0]
+    let form = _form || document.getElementsByTagName('form')[0]
     let nodes = form.getElementsByTagName('input')
     let body = {}
     for (let i = 0; i < nodes.length; i++) {
